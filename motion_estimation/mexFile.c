@@ -49,7 +49,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	limLD = order((int)(j1+0.5*wSize),W-bSize-1,0);
 	//mexPrintf("limS=%d ,limI = %d,limLE = %d,limLD = %d\n",limS,limI,limLE,limLD);
 
-	for(i2=limS; i2<=limI-bSize-1; i2++)
+	for(i2=limS; i2<=limI-bSize-1; i2 +=bSize)
 		for(j2=limLE; j2<=limLD-bSize-1; j2++)
 		{
 			//mexPrintf("i=%d \n",i2);
@@ -57,7 +57,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			err = 0;
 			for(i=i2; i<(i2+bSize); i++)
 				for(j=j2; j<(j2+bSize); j++){
-					//mexPrintf("i=%d  - j=%d\n",i,j);
+					mexPrintf("i=%d  - j=%d\n",i,j);
 					err += ImRef[i*H+j] - ImLowFre[i*H+j];
 				}
 

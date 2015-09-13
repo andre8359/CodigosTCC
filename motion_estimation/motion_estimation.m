@@ -6,12 +6,14 @@ function vector = motion_estimation(ImRef,ImLowFre,wSize,bSize)
 	%ImLowFre => Imagem com baixa frequência;
 	%wSize => Tamanho da janela de busca;
 	%bSize => Tamanho do bloco;
-
+	[H,W] = size(ImRef);
 	k = 1;
+	vMov = (ones(floor(H*W/(bSize*bSize)),2));
 	for i1 = 1:bSize:size(ImRef,1)-mod(size(ImRef,1),wSize)
     		for j1 = 1:bSize:size(ImRef,2)-mod(size(ImRef,2),wSize)
-         		[vMov(k,1),vMov(k,2)] = ME(ImRef,ImLowFre,wSize,bSize,i1,j1);
-       	 	k=k+1;
+    			disp('Text');
+	         		vMov(k,:) = mexFile (ImRef,ImLowFre,W,H,wSize,bSize,i1,j1);
+	       	 	k=k+1;
     		end
 	end
 	vector = vMov;
