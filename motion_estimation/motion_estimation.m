@@ -9,11 +9,13 @@ function vector = motion_estimation(ImRef,ImLowFre,wSize,bSize)
 	[H,W] = size(ImRef);
 	k = 1;
 	vMov = (ones(floor(H*W/(bSize*bSize)),2));
-	for i1 = 1:bSize:size(ImRef,1)-mod(size(ImRef,1),wSize)
-    		for j1 = 1:bSize:size(ImRef,2)-mod(size(ImRef,2),wSize)
+
+	for i1 = 1:bSize:(H-mod(H,bSize))
+    		for j1 = 1:bSize:(W-mod(W,bSize))
     			disp('Text');
-	         		vMov(k,:) = mexFile (ImRef,ImLowFre,W,H,wSize,bSize,i1,j1);
-	       	 	k=k+1;
+    			pause();
+	         		vMov(k,:) = mexFile (ImRef,ImLowFre,W,H,wSize,bSize,i1,j1)
+	       	 	k=k+1
     		end
 	end
 	vector = vMov;

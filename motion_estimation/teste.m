@@ -30,6 +30,6 @@ ImLowFre = reshape(ImLowFre',H*W,1);
 vector = motion_estimation(ImRef,ImLowFre,wSize,bSize);
 
 %disp('###     COMPENSATION     ###');
-[ImComp] = compensation(ImRef,vector,bSize,wSize);
+%[ImComp] = compensation(ImRef,vector,bSize,wSize);
 
 %figure;imsHoW(ImComp,[]);

@@ -1,7 +1,6 @@
 #include "mex.h"
 #include <math.h>
 
-
 int order(int v1,int v2,int flag);
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -49,7 +48,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	limLD = order((int)(j1+0.5*wSize),W-bSize-1,0);
 	//mexPrintf("limS=%d ,limI = %d,limLE = %d,limLD = %d\n",limS,limI,limLE,limLD);
 
-	for(i2=limS; i2<=limI-bSize-1; i2 +=bSize)
+	for(i2=limS; i2<=limI-bSize-1; i2++)
 		for(j2=limLE; j2<=limLD-bSize-1; j2++)
 		{
 			//mexPrintf("i=%d \n",i2);
