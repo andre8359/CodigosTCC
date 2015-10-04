@@ -3,32 +3,29 @@ clc; clear all; close all;
 addpath ../imgs;
 addpath ../code;
 
-mex mexFile.c
+
 
 bSize = 8;
-wSize = 256;
+wSize = 24;
 
-%disp(' ###    LOAD IMAGE       ###');
+disp(' ###    LOAD IMAGE       ###');
 
-ImRef = double(imread('Lena256.bmp'));
-ImRef(1:10,1:10)  = zeros(10);
+%temp = double(imread('Lena256.bmp'));
+ImRef = zeros(64);
+
+ImRef( bSize: 2*bSize, bSize: 2*bSize ) = 255;
+[H,W] = size(ImRef);
+
+
 figure; imshow(ImRef,[]);
 
-%disp('### CREATE IMAGE TEST ###')
-ImLowFre = double(zeros(size(ImRef)));
-[H,W] = size(ImRef);
-ImLowFre(H/2-100:H/2+100,W/2-100:W/2+100) = ImRef(H/2-100:H/2+100,W/2-100:W/2+100);
+disp('### CREATE IMAGE TEST ###')
+ImLowFre = zeros(64);
+
+ImLowFre( 2*bSize:3*bSize, 2*bSize:3*bSize) = 255.0;
 figure;imshow(ImLowFre,[]);
-%disp('### MOTION ESTIMATION ###');
+disp('### MOTION ESTIMATION ###')
 
-i1=1;j1=1;
-ImRef = reshape(ImRef',H*W,1);
-ImLowFre = reshape(ImLowFre',H*W,1);
-vector = mexFile (ImRef,ImLowFre,W,H,wSize,bSize,i1,j1)
+[full0to1 dists] = Motion_Est_n_Comp(ImLowFre, ImRef, ImRef, wSize, wSize, bSize, bSize);
 
-%vector = motion_estimation(ImRef,ImLoWFre,WSize,bSize);
-
-%disp('###     COMPENSATION     ###');
-%[ImComp] = compensation(ImRef,vector,bSize,WSize);
-
-%figure;imsHoW(ImComp,[]);
+figure;imshow(full0to1,[]);
