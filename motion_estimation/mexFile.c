@@ -1,7 +1,6 @@
 #include "mex.h"
 #include <math.h>
 
-
 int order(int v1,int v2,int flag);
 
 void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -57,7 +56,7 @@ void mexFunction (int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			err = 0;
 			for(i=i2; i<(i2+bSize); i++)
 				for(j=j2; j<(j2+bSize); j++){
-					//mexPrintf("i=%d  - j=%d\n",i,j);
+					mexPrintf("i=%d  - j=%d\n",i,j);
 					err += ImRef[i*H+j] - ImLowFre[i*H+j];
 				}
 

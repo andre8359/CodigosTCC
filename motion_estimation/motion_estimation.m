@@ -6,7 +6,6 @@ function vector = motion_estimation(ImRef,ImLowFre,wSize,bSize)
 	%ImLowFre => Imagem com baixa frequência;
 	%wSize => Tamanho da janela de busca;
 	%bSize => Tamanho do bloco;
-
             [H,W] = size(ImRef);
             vector = zeros((H*W)/(bSize^2),2);
 	k = 1;
@@ -14,8 +13,7 @@ function vector = motion_estimation(ImRef,ImLowFre,wSize,bSize)
     		for j1 = 1:bSize:W - mod( W , bSize) - bSize
          		[vector(k,1),vector(k,2)] = ME(ImRef,ImLowFre,wSize,bSize,i1,j1);
        	 	k=k+1;
-    		end
-	end
+            end
 
 endfunction
 
