@@ -3,3 +3,4 @@ Movie          W        H         N Frames
 akiyo_cif      352     288        300
 foreman        352     288        300
 shields        1280    720        504
+sequece_test   64      64         64
