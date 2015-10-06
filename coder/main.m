@@ -1,5 +1,5 @@
 %function coder(videoStream,width,height,param)
-	addpath ../code;	
+	addpath ../code;
 	%yuv = '720p50_shields_ter.yuv';
 	%height = 720;
 	%width = 1280;
