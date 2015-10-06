@@ -27,11 +27,11 @@ function create_yuv(Y,U,V,filename,numfrm,typeOpen)
 	end;
 
 	for i=1:numfrm
-		Yd = Y{i}';
+		Yd = Y(:,:,i);
 		fwrite(fid,Yd,'uchar');
-		UVd = U{i}';
+		UVd = U(:,:,i);;
 		fwrite(fid,UVd,'uchar');
-		UVd = V{i}';
+		UVd = V(:,:,i);;
 		fwrite(fid,UVd,'uchar');
 	end;
 	fclose(fid);

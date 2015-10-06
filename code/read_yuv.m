@@ -1,4 +1,4 @@
-function [mov] = read_yuv(fileName, width, height, idxFrame,typeYuv)
+function [mov1,mov2,mov3] = read_yuv(fileName, width, height, idxFrame,typeYuv)
     %[mov,imgRgb] = read_yuv(fileName, width, height, idxFrame)
     %fileName --> Nome arquivo de entrada
     %height --> Num de linhas
@@ -26,7 +26,9 @@ function [mov] = read_yuv(fileName, width, height, idxFrame,typeYuv)
     imgU = zeros(width/2, height/2);
     imgV = zeros(width/2, height/2);
     nrFrame = length(idxFrame);
-    mov  = zeros(height,width,length(idxFrame));
+    mov1  = zeros(height,width,length(idxFrame));
+    mov2  = zeros(height/2,width/2,length(idxFrame));
+    mov3  = zeros(height/2,width/2,length(idxFrame));
 
     for f = 1 : 1 : nrFrame
         % procura posição do frame no arquivo
@@ -35,14 +37,17 @@ function [mov] = read_yuv(fileName, width, height, idxFrame,typeYuv)
 
         % lê componemte Y
         buf = fread(fileId, height*width, 'uchar');
-        mov(:,:,f) = clipValue(reshape(buf, width, height).',0,255); % reshape
+        mov1(:,:,f) = clipValue(reshape(buf, width, height).',0,255); % reshape
 
         % lê  componemte U
         buf = fread(fileId, width / 2 * height / 2, 'uchar');
+        mov2(:,:,f) = clipValue(reshape(buf, width/2, height/2).',0,255); % reshape
+
         %imgU_ = reshape(buf, width / 2, height / 2)'; % reshape and upsample
         %imgYUV(:,:,2) = DCT_Blk_Resize(imgU_,8,16);
         % lê componente V
         buf = fread(fileId, width / 2 * height / 2, 'uchar');
+        mov3(:,:,f) = clipValue(reshape(buf, width/2, height/2).',0,255);
         %imgV_ = reshape(buf, width / 2, height / 2)'; % reshape and upsample
         %imgYUV(:,:,3) = DCT_Blk_Resize(imgV_,8,16);
         % normalize YUV values
