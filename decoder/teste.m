@@ -16,35 +16,9 @@ downsampleFactor = 0.5;
 nEvenFrames  = number_frames(evenFramesID,H*downsampleFactor,W*downsampleFactor);
 nOddFrames  = number_frames(oddFramesID,H,W);
 
-printf('### LOAD IMAGES ###\n');fflush(stdout);
-evenFrameDownY = read_yuv(evenFramesID, W*downsampleFactor, H*downsampleFactor, [1:1:nEvenFrames]);
-[oddFramesY] = read_yuv(oddFramesID, W, H, [1:1:nOddFrames]);
 
-printf('###  CREATE A LOW FRE REF IMAGES ###\n');fflush(stdout);
-ret = system(['ffmpeg  -s ' num2str(W) 'x' num2str(H) ' -i ' oddFramesID ' -s ' num2str(W*downsampleFactor) 'x' num2str(H*downsampleFactor) ' odd_low_fre_ref.yuv' ]);
-[oddFramesLowFreDownY] = read_yuv('odd_low_fre_ref.yuv' , W*downsampleFactor, H*downsampleFactor, [1:1:nOddFrames]);
+[evenFramesCalc , dists] = decoder(evenFramesID, oddFramesID, H,W,downsampleFactor,nEvenFrames,nOddFrames,bSize,wSize);
 
-printf('###  CREATE SCALING LOW FRE REF IMAGES ###\n');fflush(stdout);
-oddFramesLowFreY  = zeros(H,W,nOddFrames);
-evenFrameY = zeros(H,W,nOddFrames);
-for i = 1:nOddFrames
-    oddFramesLowFreY(:,:,i) = DCT_Blk_Resize(oddFramesLowFreDownY(:,:,i), bSize , bSize/downsampleFactor);
-    evenFrameY(:,:,i) = DCT_Blk_Resize(evenFrameDownY(:,:,i), bSize , bSize/downsampleFactor);
-end
-
-printf('###  CREATE COMPENSATION IMAGES ###\n');fflush(stdout);
-evenFramesCalc = zeros(H,W,nOddFrames);
-for i =1:nOddFrames
-    [evenFramesCalc(:,:,i)] = Motion_Est_n_Comp(evenFrameY(:,:,i), oddFramesLowFreY(:,:,i), oddFramesY(:,:,i), wSize, wSize, bSize, bSize);
-end
-
-
-create_yuv(evenFramesCalc,U,V,filename,numfrm,typeOpen)
-
-%for i = 1:32
-%    err = err + sum(sum((evenFramesCalc(:,:,i) - evenFrameY(:,:,i)).^2));
-%end
-err
 % k=1;
 % j=1;
 % bSize = 8;
