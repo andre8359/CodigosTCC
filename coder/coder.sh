@@ -5,7 +5,6 @@ VIDEO=$1
 SIZE="$3x$2"
 NEW_SIZE="$5x$4"
 
-
 #coding
 echo "### CODING ODD FRAMES ###"
 ffmpeg -r 2 -s $SIZE -i $VIDEO -filter:v select="mod(n-1\,2)"  -r 1 -vcodec mjpeg -qscale 1  odd.avi
