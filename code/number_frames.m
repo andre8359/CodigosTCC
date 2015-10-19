@@ -1,4 +1,4 @@
-function [nFrames,ret]=number_frames(fileName,height,width)
+function [nFrames,ret] = number_frames(fileName,height,width)
 
     fileId = fopen(fileName, 'r');
     ret = 1;

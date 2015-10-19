@@ -2,3 +2,5 @@
 *.yuv
 *.avi
 *workspace
+*.elf
+*.s
