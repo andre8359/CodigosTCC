@@ -4,3 +4,4 @@
 *workspace
 *.elf
 *.s
+*.pyc
