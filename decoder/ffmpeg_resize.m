@@ -13,4 +13,4 @@ function [read_imgs] = ffmpeg_resize(video,H,W,newH,newW,frames)
 
         [read_imgs] = read_yuv('resize_.yuv' , newW, newH, [1:1:frames]);
 
-        system('rm -irf resize.yuv');
+        system('rm -irf resize.yuv resize_.yuv');

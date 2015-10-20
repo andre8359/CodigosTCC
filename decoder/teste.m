@@ -2,7 +2,7 @@ clc; clear all; close all;
 addpath ../code;
 
 printf('### DELETING .YUV CREATED IN THE PROCESS ###\n');fflush(stdout);
-ret = system('rm *.yuv');
+
 
 printf('### SETING PARAMETERS ###\n');
 fflush(stdout);
@@ -13,8 +13,8 @@ oddFramesID = '../coder/sequence_test_odd.yuv';
 H = 64;
 W = 64;
 downsampleFactor = 0.5;
-nEvenFrames  = number_frames(evenFramesID,H*downsampleFactor,W*downsampleFactor)
-nOddFrames  = number_frames(oddFramesID,H,W)
+nEvenFrames  = number_frames(evenFramesID,H*downsampleFactor,W*downsampleFactor);
+nOddFrames  = number_frames(oddFramesID,H,W);
 
 
 [evenFramesCalc , dists] = decoder(evenFramesID, oddFramesID, H,W,downsampleFactor,nEvenFrames,nOddFrames,bSize,wSize);

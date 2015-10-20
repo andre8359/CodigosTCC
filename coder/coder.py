@@ -31,6 +31,7 @@ class coder():
         os.system(ffmpeg_ + " -i " + outputFIle_ + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+ outputFIle_ + ".yuv")
 
         outputFIle_ = self.video + "_even"
+        filter_ = " -filter:v select=\"mod(n\,2)\" "
         returnEven = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
                                                                 self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + " -s "+ self.newW.__str__()\
                                                                 + "x" + self.newH.__str__() +" " + outputFIle_ + ".avi")
