@@ -1,8 +1,17 @@
 #! /usr/bin/env python
 
 from coder import *
+t = 0
+fileD = open("../videos/catalogo.txt","r")
+downsampleFactor = [1.0/8, 2.0/8, 4.0/8, 8.0/8]
+line = fileD.readline()
 
-cod = coder("foreman", 288, 352, 1.0/8,"../videos/" )
-cod.coderJPEG()
-cod.calcBitRate()
-cod.deleteVideoFiles()
+while line  :
+    line = fileD.readline()
+    data = line.split()
+    for x in downsampleFactor:
+        print(data[0] + data[2] + data[1] + x.__str__() + "../videos/")
+        cod = coder(data[0], int(data[2]), int(data[1]), x,"../videos/" )
+        cod.coderJPEG()
+        cod.calcBitRate()
+        cod.deleteVideoFiles()
