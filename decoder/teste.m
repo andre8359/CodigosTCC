@@ -3,21 +3,47 @@ addpath ../code;
 
 printf('### DELETING .YUV CREATED IN THE PROCESS ###\n');fflush(stdout);
 
+test = 1
+switch test
+    case 1
+        evenFramesID = 'foreman_even.yuv';
+        evenOrigialFramesID = 'foreman_even_original.yuv';
+        oddFramesID = 'foreman_odd.yuv';
+        H = 288;
+        W = 352;
+    case 2
+        evenFramesID = 'sequence_test_even.yuv';
+        evenOrigialFramesID = 'sequence_test_even_original.yuv';
+        oddFramesID = 'sequence_test_odd.yuv';
+        H = 64;
+        W = 64;
+end
 
 printf('### SETING PARAMETERS ###\n');
 fflush(stdout);
 bSize = 8;
 wSize = 24;
-evenFramesID = '../coder/sequence_test_even.yuv';
-oddFramesID = '../coder/sequence_test_odd.yuv';
-H = 64;
-W = 64;
 downsampleFactor = 0.5;
-nEvenFrames  = number_frames(evenFramesID,H*downsampleFactor,W*downsampleFactor);
-nOddFrames  = number_frames(oddFramesID,H,W);
+nEvenFrames  = 2% number_frames(evenFramesID,H*downsampleFactor,W*downsampleFactor);
+nOddFrames  = 2 %number_frames(oddFramesID,H,W);
 
 
 [evenFramesCalc , dists] = decoder(evenFramesID, oddFramesID, H,W,downsampleFactor,nEvenFrames,nOddFrames,bSize,wSize);
+
+evenFrameY = ffmpeg_resize(evenFramesID, H*downsampleFactor, W*downsampleFactor, H, W,nOddFrames);
+
+evenFrameYSP = evenFrameY + evenFramesCalc;
+
+evenFrameOriginalY = read_yuv(evenOrigialFramesID, W, H, [1:1:nOddFrames]);
+
+MSE  = size(nOddFrames,1);
+
+for i = 1:1:nOddFrames
+    MSE(i,1)  = (sum(sum((evenFrameOriginalY(:,:,i) - evenFrameYSP(:,:,i)).^2))) / (H*W);
+      MSE(i,2)  = (sum(sum((evenFrameOriginalY(:,:,i) - evenFrameY(:,:,i)).^2))) / (H*W);
+end
+
+PSNR = 10*log10((255^2)./MSE);
 
 % k=1;
 % j=1;

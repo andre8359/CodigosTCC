@@ -15,5 +15,6 @@ from coder import *
 #         cod.coderJPEG()
 #         cod.calcBitRate()
         #cod.deleteVideoFiles()
-cod = coder("sequence_test",64,64,0.5,"../videos/")
+cod = coder("foreman",288,352,0.5,"../videos/",1)
 cod.coderJPEG()
+#foreman 352     288     300

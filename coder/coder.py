@@ -3,7 +3,7 @@ import os
 
 class coder():
 
-    def __init__(self,video,H,W,downsampleFactor,dir_):
+    def __init__(self,video,H,W,downsampleFactor,dir_,even_original):
         self.video  = video
         self.H = H
         self.W = W
@@ -14,28 +14,35 @@ class coder():
         self.dir_ = dir_
         self.video_odd = video + "_odd.yuv"
         self.video_even = video + "_even.yuv"
+        self.even_original = even_original
 
 
 
     def  coderJPEG(self):
+
         ffmpeg_ = "ffmpeg "
         rate_ = "-r 2 -s "
         filter_ = " -filter:v select=\"mod(n-1\,2)\" "
         jpeg_ = "-r 1 -vcodec mjpeg "
         qscale_ = "-qscale " + self.qscale.__str__() + " "
         outputFIle_ = self.video + "_odd"
-        print(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + outputFIle_ )
+        #print(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + outputFIle_ )
         returnOdd = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
                                                                 self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + outputFIle_ + ".avi")
 
         os.system(ffmpeg_ + " -i " + outputFIle_ + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+ outputFIle_ + ".yuv")
 
         outputFIle_ = self.video + "_even"
-        filter_ = " -filter:v select=\"mod(n\,2)\" "
+        filter_ = " -filter:v select=\"not(mod(n-1\,2))\" "
         returnEven = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
                                                                 self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + " -s "+ self.newW.__str__()\
                                                                 + "x" + self.newH.__str__() +" " + outputFIle_ + ".avi")
         os.system(ffmpeg_ + " -i " +outputFIle_ + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+outputFIle_ + ".yuv")
+
+        if self.even_original :
+            outputFIle_=    self.video + "_even_original"
+            os.system(ffmpeg_ + rate_ + self.W.__str__() +  "x" + self.H.__str__() + " -i " + self.dir_+ self.video + ".yuv" \
+            + filter_ + " -c:v rawvideo -r 1 -format rawvideo -pix_fmt yuv420p -s "+ self.W.__str__() +  "x" + self.H.__str__() +" " + outputFIle_ + ".yuv" )
 
         if returnOdd + returnEven > 0:
             print("### ERRO!!!! ###")
