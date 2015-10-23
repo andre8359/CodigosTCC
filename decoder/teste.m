@@ -36,14 +36,7 @@ evenFrameYSP = evenFrameY + evenFramesCalc;
 
 evenFrameOriginalY = read_yuv(evenOrigialFramesID, W, H, [1:1:nOddFrames]);
 
-MSE  = size(nOddFrames,1);
 
-for i = 1:1:nOddFrames
-    MSE(i,1)  = (sum(sum((evenFrameOriginalY(:,:,i) - evenFrameYSP(:,:,i)).^2))) / (H*W);
-      MSE(i,2)  = (sum(sum((evenFrameOriginalY(:,:,i) - evenFrameY(:,:,i)).^2))) / (H*W);
-end
-
-PSNR = 10*log10((255^2)./MSE);
 
 % k=1;
 % j=1;

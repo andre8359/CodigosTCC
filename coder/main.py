@@ -3,7 +3,7 @@
 from coder import *
 
 #fileD = open("../videos/catalogo.txt","r")
-#downsampleFactor = [1.0/8, 2.0/8, 4.0/8, 8.0/8]
+#downsampleFactor = [2.0/8, 4.0/8]
 #line = fileD.readline()
 
 # while line  :
@@ -17,4 +17,5 @@ from coder import *
         #cod.deleteVideoFiles()
 cod = coder("foreman",288,352,0.5,"../videos/",1)
 cod.coderJPEG()
+cod.calcBitRate()
 #foreman 352     288     300

@@ -12,8 +12,8 @@ class coder():
         self.newW = int(float(W*downsampleFactor))
         self.qscale = 1
         self.dir_ = dir_
-        self.video_odd = video + "_odd.yuv"
-        self.video_even = video + "_even.yuv"
+        self.video_odd = video + "_odd"
+        self.video_even = video + "_even"
         self.even_original = even_original
 
 
@@ -28,7 +28,7 @@ class coder():
         outputFIle_ = self.video + "_odd"
         #print(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + outputFIle_ )
         returnOdd = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
-                                                                self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + outputFIle_ + ".avi")
+                                                                self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + self.video_odd + ".avi")
 
         os.system(ffmpeg_ + " -i " + outputFIle_ + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+ outputFIle_ + ".yuv")
 
@@ -36,7 +36,7 @@ class coder():
         filter_ = " -filter:v select=\"not(mod(n-1\,2))\" "
         returnEven = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
                                                                 self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + " -s "+ self.newW.__str__()\
-                                                                + "x" + self.newH.__str__() +" " + outputFIle_ + ".avi")
+                                                                + "x" + self.newH.__str__() +" " + self.video_even + ".avi")
         os.system(ffmpeg_ + " -i " +outputFIle_ + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+outputFIle_ + ".yuv")
 
         if self.even_original :
@@ -48,22 +48,19 @@ class coder():
             print("### ERRO!!!! ###")
             quit()
 
-        self.deleteAviFiles()
-
-
     def coderH264(self):
         print("TRETA")
 
-    def calcBitRate(self,):
+    def calcBitRate(self):
 
-        fileR = open("bitrates.txt","a")
+        fileR = open("bitrates.txt","w")
 
         if  fileR == 0 :
             print("### NAO FOI POSSIVEL ABRIR bitrates.txt !!! ###")
             quit()
 
-        odd = os.stat(self.video_odd)
-        even = os.stat(self.video_even)
+        odd = os.stat(self.video_odd + ".avi")
+        even = os.stat(self.video_even + ".avi")
 
         length_odd = float(odd.st_size)
         length_even = float(even.st_size)
@@ -75,8 +72,5 @@ class coder():
 
         fileR.close()
 
-
-    def deleteAviFiles(self):
-        os.system("rm -irf *.avi")
     def deleteVideoFiles(self):
         os.system("rm -irf *.avi *.yuv")
