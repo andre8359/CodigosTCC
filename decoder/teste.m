@@ -36,9 +36,11 @@ evenFrameYSP = evenFrameY + evenFramesCalc;
 
 evenFrameOriginalY = read_yuv(evenOrigialFramesID, W, H, [1:1:nOddFrames]);
 
-
-
-% k=1;
+PSNR1  = PSNR(evenFrameOriginalY, evenFrameYSP,H,W,nOddFrames);
+fileD = fopen ('bitrates.txt','a');
+fdisp(fileD, PSNR1);
+fclose(fileD)
+    % k=1;
 % j=1;
 % bSize = 8;
 % a = zeros(64,64);

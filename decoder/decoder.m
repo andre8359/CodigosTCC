@@ -15,19 +15,16 @@ function [evenFramesCalc , dists] = decoder(evenFramesID, oddFramesID, H,W,downs
 
     oddFramesLowFreY =  ffmpeg_resize(oddFramesLowFreDownY,H*downsampleFactor,W*downsampleFactor, H, W,nOddFrames);
     evenFrameY = ffmpeg_resize(evenFrameDownY,H*downsampleFactor,W*downsampleFactor, H, W,nOddFrames);
-            figure; imshow(oddFramesLowFreY(:,:,1),[]);
-        figure; imshow(evenFrameY(:,:,1),[]);
+
 
     printf('###  CREATE COMPENSATION IMAGES ###\n');fflush(stdout);
     evenFramesCalc = zeros(H,W,nOddFrames);
     for i =1:nOddFrames
         [evenFramesCalc(:,:,i), dists] = Motion_Est_n_Comp(evenFrameY(:,:,i), oddFramesLowFreY(:,:,i), oddFramesY(:,:,i), wSize, wSize, bSize, bSize);
-        figure; imshow(evenFramesCalc(:,:,i),[]);
     end
-        figure; imshow(evenFramesCalc(:,:,1),[]);
+
 
     temp = ffmpeg_resize(evenFramesCalc,H,W,H*downsampleFactor,W*downsampleFactor,nOddFrames);
     evenFramesCalcDownFreqY = zeros(H,W,nOddFrames);
     evenFramesCalcDownFreqY = ffmpeg_resize(temp,H*downsampleFactor,W*downsampleFactor,H,W,nOddFrames);
-    figure; imshow(evenFramesCalcDownFreqY(:,:,i),[]);
     evenFramesCalc = evenFramesCalc -  evenFramesCalcDownFreqY;
