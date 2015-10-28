@@ -1,6 +1,32 @@
 #! /usr/bin/env python
 
 from coder import *
+import sys
+
+
+
+video = sys.argv[1]
+H = int(sys.argv[2])
+W = int(sys.argv[3])
+downsampleFactor = [2.0/8, 4.0/8]
+dir_ = sys.argv[4]
+qscale = range(1,32)
+
+cod = coder(video,H,W,0.5,"../videos/",1)
+
+for i in downsampleFactor:
+    cod.downsampleFactor = i
+    cod.codingJpegOddFrames()
+    for x in qscale:
+
+        cod.number = x
+        cod.coderJPEG()
+        cod.calcBitRate()
+        #cod.deleteAviFiles()
+
+cod.getOriginalEvenFrames()
+cod.deleteAviFiles()
+
 
 #fileD = open("../videos/catalogo.txt","r")
 #downsampleFactor = [2.0/8, 4.0/8]
@@ -15,7 +41,5 @@ from coder import *
 #         cod.coderJPEG()
 #         cod.calcBitRate()
         #cod.deleteVideoFiles()
-cod = coder("foreman",288,352,0.5,"../videos/",1)
-cod.coderJPEG()
-cod.calcBitRate()
+
 #foreman 352     288     300

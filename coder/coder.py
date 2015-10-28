@@ -3,7 +3,7 @@ import os
 
 class coder():
 
-    def __init__(self,video,H,W,downsampleFactor,dir_,even_original):
+    def __init__(self,video,H,W,downsampleFactor,dir_,number):
         self.video  = video
         self.H = H
         self.W = W
@@ -12,39 +12,39 @@ class coder():
         self.newW = int(float(W*downsampleFactor))
         self.qscale = 1
         self.dir_ = dir_
-        self.video_odd = video + "_odd"
-        self.video_even = video + "_even"
-        self.even_original = even_original
-
-
+        self.video_odd = video + "_odd_" + self.downsampleFactor.__str__()
+        self.video_even = video +"_" + number.__str__() +"_even"
+        self.number = number
 
     def  coderJPEG(self):
-
         ffmpeg_ = "ffmpeg "
         rate_ = "-r 2 -s "
         filter_ = " -filter:v select=\"mod(n-1\,2)\" "
         jpeg_ = "-r 1 -vcodec mjpeg "
-        qscale_ = "-qscale " + self.qscale.__str__() + " "
-        outputFIle_ = self.video + "_odd"
-        #print(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + outputFIle_ )
-        returnOdd = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
-                                                                self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + self.video_odd + ".avi")
 
-        os.system(ffmpeg_ + " -i " + outputFIle_ + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+ outputFIle_ + ".yuv")
-
-        outputFIle_ = self.video + "_even"
+        #CODING EVEN FRAMES WITH DOWNSAMPLING
+        qscale_ =  " -q " + self.number.__str__() + " "
+        self.video_even = self.video + "_even_" + self.downsampleFactor.__str__() + "_" + self.number.__str__()
         filter_ = " -filter:v select=\"not(mod(n-1\,2))\" "
+
         returnEven = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
                                                                 self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + " -s "+ self.newW.__str__()\
                                                                 + "x" + self.newH.__str__() +" " + self.video_even + ".avi")
-        os.system(ffmpeg_ + " -i " +outputFIle_ + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+outputFIle_ + ".yuv")
+        #DECODING EVEN FRAMES
+        os.system(ffmpeg_ + " -i " +self.video_even + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+self.video_even + ".yuv")
 
-        if self.even_original :
-            outputFIle_=    self.video + "_even_original"
-            os.system(ffmpeg_ + rate_ + self.W.__str__() +  "x" + self.H.__str__() + " -i " + self.dir_+ self.video + ".yuv" \
-            + filter_ + " -c:v rawvideo -r 1 -format rawvideo -pix_fmt yuv420p -s "+ self.W.__str__() +  "x" + self.H.__str__() +" " + outputFIle_ + ".yuv" )
 
-        if returnOdd + returnEven > 0:
+
+        #CODINNG ORIGINAL EVEN FRAMES WITH NO DOWNSAMPLING
+        outputFIle_=    self.video + "_even_original_coding_" + self.downsampleFactor.__str__() \
+                                                                + "_" + self.number.__str__()
+        os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
+                                                                self.video + ".yuv"+ filter_ + jpeg_ + qscale_ +  \
+                                                                " " + outputFIle_ + ".avi")
+        #DECODING EVEN FRAMES
+        os.system(ffmpeg_ + " -i " +outputFIle_ + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+ outputFIle_ + ".yuv")
+
+        if  returnEven > 0:
             print("### ERRO!!!! ###")
             quit()
 
@@ -53,7 +53,10 @@ class coder():
 
     def calcBitRate(self):
 
-        fileR = open("bitrates.txt","w")
+        self.video_odd = self.video + "_odd_" + self.downsampleFactor.__str__()
+        self.video_even = self.video + "_even_" + self.downsampleFactor.__str__() + "_" + self.number.__str__()
+
+        fileR = open("bitrates_" + self.video + ".txt","a+")
 
         if  fileR == 0 :
             print("### NAO FOI POSSIVEL ABRIR bitrates.txt !!! ###")
@@ -68,9 +71,38 @@ class coder():
         bitrate_odd = length_odd / (self.H*self.W) *1.0
         bitrate_even = length_even / (self.H*self.W) *1.0
         fileR.write(self.video + "  " + self.downsampleFactor.__str__() + \
-                                                "  " + bitrate_odd.__str__() + "    " + bitrate_even.__str__() + "\n")
-
+                "  " + bitrate_odd.__str__() + " " + bitrate_even.__str__() + " " +self.number.__str__()+"\n")
         fileR.close()
 
-    def deleteVideoFiles(self):
-        os.system("rm -irf *.avi *.yuv")
+    def deleteAviFiles(self):
+        os.system("rm -irf *.avi ")
+
+    def getOriginalEvenFrames(self):
+        mpeg_ = "ffmpeg "
+        rate_ = "-r 2 -s "
+        filter_ = " -filter:v select=\"not(mod(n-1\,2))\" "
+        jpeg_ = "-r 1 -vcodec mjpeg "
+        #GETING ORIGINAL EVEN FRAMES
+        outputFIle_=    self.video + "_" + self.number.__str__() +"_even_original"
+        os.system(ffmpeg_ + rate_ + self.W.__str__() +  "x" + self.H.__str__() + " -i " + self.dir_+ self.video + ".yuv" \
+            + filter_ + " -c:v rawvideo -r 1 -format rawvideo -pix_fmt yuv420p -s "+ self.W.__str__() +  "x" + self.H.__str__() +" " + outputFIle_ + ".yuv" )
+
+    def codingJpegOddFrames(self):
+        ffmpeg_ = "ffmpeg "
+        rate_ = "-r 2 -s "
+        filter_ = " -filter:v select=\"mod(n-1\,2)\" "
+        jpeg_ = "-r 1 -vcodec mjpeg "
+
+        self.video_odd = self.video + "_odd_" + self.downsampleFactor.__str__()
+
+        # CODING ODD FRAMES WITH NO DOWNSAMPLING
+        qscale_ = " -q:v 1 "
+        #print(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + outputFIle_ )
+
+        returnOdd = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
+                                                                self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + self.video_odd + ".avi")
+        #DECODING ODD FRAMES
+        os.system(ffmpeg_ + " -i " + self.video_odd + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+ self.video_odd + ".yuv")
+        if  returnOdd > 0:
+            print("### ERRO!!!! ###")
+            quit()
