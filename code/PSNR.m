@@ -1,5 +1,15 @@
-function psnr_value = PSNR(a,b)
+function  [dB] = PSNR(image1,image2, H,W,nFrames)
 
-a = clip(a(:),[0 255]);
-b = clip(b(:),[0 255]);
-psnr_value = 10*log10(255*255/mean(mean((a-b).^2)));
+    if nargin < 5
+        nFrames = 1;
+    end
+
+    MSE  = size(nFrames,1);
+
+    for i = 1:1:nFrames
+        MSE(i)  = (sum(sum((image1(:,:,i) - image2(:,:,i)).^2))) / (H*W);
+
+    end
+
+    PSNR = 10*log10((255^2)./MSE);
+    dB = mean(PSNR);

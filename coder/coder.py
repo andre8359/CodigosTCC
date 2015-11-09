@@ -55,7 +55,6 @@ class coder():
 
         self.video_odd = self.video + "_odd_" + self.downsampleFactor.__str__()
         self.video_even = self.video + "_even_" + self.downsampleFactor.__str__() + "_" + self.number.__str__()
-
         fileR = open("bitrates_" + self.video + ".txt","a+")
 
         if  fileR == 0 :
@@ -70,23 +69,53 @@ class coder():
 
         bitrate_odd = length_odd / (self.H*self.W) *1.0
         bitrate_even = length_even / (self.H*self.W) *1.0
-        fileR.write(self.video + "  " + self.downsampleFactor.__str__() + \
+        fileR.write(self.downsampleFactor.__str__() + \
                 "  " + bitrate_odd.__str__() + " " + bitrate_even.__str__() + " " +self.number.__str__()+"\n")
+        fileR.close()
+
+    def calcBitRateOriginal(self):
+
+        video =   self.video + "_even_original_" + self.number.__str__()
+        fileR = open("bitrates_" + self.video + "_original.txt","a+")
+
+        if  fileR == 0 :
+            print("### NAO FOI POSSIVEL ABRIR bitrates.txt !!! ###")
+            quit()
+
+        original = os.stat( video + ".avi")
+
+        length_original = float(original.st_size)
+
+        bitrate = length_original / (self.H*self.W) *1.0
+
+        fileR.write(self.number.__str__()+ " " + bitrate.__str__() +"\n")
         fileR.close()
 
     def deleteAviFiles(self):
         os.system("rm -irf *.avi ")
 
     def getOriginalEvenFrames(self):
-        mpeg_ = "ffmpeg "
+        ffmpeg_ = "ffmpeg "
         rate_ = "-r 2 -s "
         filter_ = " -filter:v select=\"not(mod(n-1\,2))\" "
         jpeg_ = "-r 1 -vcodec mjpeg "
         #GETING ORIGINAL EVEN FRAMES
-        outputFIle_=    self.video + "_" + self.number.__str__() +"_even_original"
+        outputFIle_=    self.video + "_even_original"
         os.system(ffmpeg_ + rate_ + self.W.__str__() +  "x" + self.H.__str__() + " -i " + self.dir_+ self.video + ".yuv" \
             + filter_ + " -c:v rawvideo -r 1 -format rawvideo -pix_fmt yuv420p -s "+ self.W.__str__() +  "x" + self.H.__str__() +" " + outputFIle_ + ".yuv" )
 
+    def codingJpegOriginalEvenFrames(self):
+        ffmpeg_ = "ffmpeg "
+        rate_ = "-r 2 -s "
+        filter_ = " -filter:v select=\"not(mod(n-1\,2))\" "
+        jpeg_ = "-r 1 -vcodec mjpeg "
+        #CODING ORIGINAL EVEN FRAMES
+        outputFIle_=    self.video + "_even_original_" + self.number.__str__()
+        qscale_ =  " -q " + self.number.__str__() + " "
+        os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
+                                                                self.video + ".yuv"+ filter_ + jpeg_ + qscale_ +  \
+                                                                " " + outputFIle_ + ".avi")
+        os.system(ffmpeg_ + " -i " + outputFIle_ + ".avi" " -c:v rawvideo -pix_fmt yuv420p "+ outputFIle_+ ".yuv")
     def codingJpegOddFrames(self):
         ffmpeg_ = "ffmpeg "
         rate_ = "-r 2 -s "

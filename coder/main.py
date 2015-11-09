@@ -2,6 +2,7 @@
 
 from coder import *
 import sys
+import os
 
 
 
@@ -10,10 +11,10 @@ H = int(sys.argv[2])
 W = int(sys.argv[3])
 downsampleFactor = [2.0/8, 4.0/8]
 dir_ = sys.argv[4]
-qscale = range(1,32)
+qscale = range(2,32)
 
 cod = coder(video,H,W,0.5,"../videos/",1)
-
+flag = 0
 for i in downsampleFactor:
     cod.downsampleFactor = i
     cod.codingJpegOddFrames()
@@ -22,12 +23,16 @@ for i in downsampleFactor:
         cod.number = x
         cod.coderJPEG()
         cod.calcBitRate()
-        #cod.deleteAviFiles()
+        if flag == 0:
+            cod.codingJpegOriginalEvenFrames()
+            cod.calcBitRateOriginal()
+    flag = 1
+        #   cod.deleteAviFiles()
 
 cod.getOriginalEvenFrames()
 cod.deleteAviFiles()
-
-
+os.system("mkdir videos")
+os.system("mv " + video +"* videos")
 #fileD = open("../videos/catalogo.txt","r")
 #downsampleFactor = [2.0/8, 4.0/8]
 #line = fileD.readline()
