@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "mex.h"   
+#include "mex.h"
 
 /* Definitions to keep compatibility with earlier versions of ML */
 #ifndef MWSIZE_MAX
@@ -30,27 +30,27 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //declare variables
     mxArray *img_out_m;
     double *img_out;
-    char *name; 
-   
+    char *name;
+
     int i,j,W,H,frame, temp, length_name, status;
     FILE * fp;
-        
+
 //associate inputs
-	
+
     length_name = (mxGetM(prhs[0]) * mxGetN(prhs[0])) + 1;
     name = mxCalloc(length_name, sizeof(char));
     status = mxGetString(prhs[0], name, length_name);
 
     W = mxGetScalar(prhs[1]);
-	H = mxGetScalar(prhs[2]);
+    H = mxGetScalar(prhs[2]);
     frame = mxGetScalar(prhs[3]);
 
 
     img_out_m = plhs[0] = mxCreateDoubleMatrix(W,H,mxREAL);
 //associate pointers
-   
+
     img_out = mxGetPr(img_out_m);
- 
+
     fp = fopen(name,"r+");
     fseek(fp,1.5*H*W*frame,SEEK_SET);
 
@@ -58,21 +58,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexPrintf("Imposivel abrir o arquivo!");
         exit(0);
     }
-    
+
 //do something
-    
+
     for(i=0;i<W;i++)
     {
         for(j=0;j<H;j++)
         {
             temp = fgetc(fp);
-            
+
             //mexPrintf("element[%d][%d] = %f\n",j,i,a[i*dimy+j]);
             img_out[i*H+j] = temp; //adds 5 to every element in a
             //d[i*dimy+j] = b[i*dimy+j]*b[i*dimy+j]; //squares b
         }
     }
-    
+
     fclose(fp);
 
     return;
