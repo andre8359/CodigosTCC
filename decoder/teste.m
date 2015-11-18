@@ -1,60 +1,79 @@
 clc; clear all; close all;
 addpath ../code;
 
+[videoIDs, w,h,nFrames] = textread('../videos/catalogo.txt','%s %d %d %d');
 
-videoID = 'foreman';
-evenFramesID = ['videos/' videoID '_even'];
-evenOrigialFramesID = ['videos/' videoID '_even_original'];
-oddFramesID = ['videos/' videoID '_odd'];
-H = 288;s
-W = 352;
-%system(['python  ../coder/main.py "' videoID '" ' num2str(H) ' ' num2str(W) ' "../videos"   > /dev/null']);
+for x=1:1:length(w)
 
-downsampleFactor =  [4.0/8  2.0/8];
-qscale = [2:1:31];
+    videoID = videoIDs{x};
+    evenFramesID = ['videos/' videoID '_even'];
+    evenOrigialFramesID = ['videos/' videoID '_even_original'];
+    oddFramesID = ['videos/' videoID '_odd'];
+    H = h(x);
+    W = w(x);
+    nFrames  =nFrames/2.0 ;
 
 
-printf('### SETING PARAMETERS ###\n');
-fflush(stdout);
-bSize = 8;
-wSize = 24;
-nFrames  = 150;
-%evenFrameOriginalY = read_yuv([evenOrigialFramesID '.yuv'], W, H, [1:1:nFrames]);
-PSNR1 = zeros(nFrames,1);
+    system(['python  ../coder/main.py "' videoID '" ' num2str(H) ' ' num2str(W) ' ' num2str(150) ' "../videos"   > /dev/null']);
 
-for i = 1 : length(downsampleFactor)
-    for k = 1:length(qscale)
-        for frame = 1 : 1 : nFrames
-            evenFrameOriginalY = read_yuv([evenOrigialFramesID '.yuv'], W, H, frame);
+    downsampleFactor =  [4.0/8  2.0/8];
+    qscale = [2:1:31];
 
-            [evenFramesCalc , dists] = decoder([evenFramesID '_' num2str(downsampleFactor(i)) '_' num2str(qscale(k))] , ...
-                                            [oddFramesID '_' num2str(downsampleFactor(i))], H,W,downsampleFactor(i),frame,bSize,wSize);
 
-            evenFrameY = ffmpeg_resize([evenFramesID '_' num2str(downsampleFactor(i)) '_' num2str(qscale(k)) '.yuv'], ...
-                                                                                            H*downsampleFactor(i), W*downsampleFactor(i), H, W,nFrames);
+    printf('### SETING PARAMETERS ###\n');
+    fflush(stdout);
+    bSize = 8;
+    wSize = 24;
+    nFrames  =2;% nFrames/2.0 ;
+    %evenFrameOriginalY = read_yuv([evenOrigialFramesID '.yuv'], W, H, [1:1:nFrames]);
 
-            evenFrameYSP = evenFrameY + evenFramesCalc;
 
-            PSNR1(i,k)  = PSNR(evenFrameOriginalY, evenFrameYSP,H,W);
-            %fileD = fopen (['PSNR_' videoID '_SP.txt'],'a');
-            %fdisp(fileD, [downsampleFactor(i) qscale(k) PSNR1]);
-           %fclose(fileD);
+    for i = 1 : 1 : length(downsampleFactor)
+        for k = 1: 1 :length(qscale)
+
+            printf(['### downsampleFactor ' num2str(downsampleFactor(i)) ' qscale ' num2str(qscale(k)) ' ###\n']);fflush(stdout);
+
+           for frame = 0 : 1 : nFrames-1
+
+                evenFrameOriginalY = read_yuv([evenOrigialFramesID '.yuv'], W, H, frame)';
+
+                evenID = [evenFramesID '_' num2str(downsampleFactor(i)) '_' num2str(qscale(k))];
+                oddID =  [oddFramesID '_' num2str(downsampleFactor(i))];
+                [evenFramesCalc , dists] = decoder(evenID,oddID, H,W,downsampleFactor(i),frame,bSize,wSize);
+
+                evenFrameY = ffmpeg_resize([evenFramesID '_' num2str(downsampleFactor(i)) '_' num2str(qscale(k)) '.yuv'], ...
+                                                                                         H*downsampleFactor(i), W*downsampleFactor(i), H, W,frame);
+
+                evenFrameYSP = evenFrameY + evenFramesCalc;
+
+                PSNR1(i,k,frame+1)  = PSNR(evenFrameOriginalY, evenFrameYSP,H,W);
+
+                %evenFrameY = read_yuv([evenID  '.yuv'], W, H,frame)';
+
+
+                PSNR2(i,k,frame+1)   = PSNR(evenFrameOriginalY, evenFrameY,H,W);
+
+                evenFrameYOrigial = read_yuv([evenOrigialFramesID '_' num2str(qscale(k)) '.yuv'], W, H,frame)';
+                PSNR3(i,k,frame+1)   = PSNR(evenFrameOriginalY, evenFrameYOrigial,H,W);
+
+            end
         end
     end
-end
 
-for i = 1 : length(downsampleFactor)
-    for k = 1:length(qscale)
-        evenFrameY = read_yuv([evenOrigialFramesID '_coding_' num2str(downsampleFactor(i)) '_' ...
-                num2str(qscale(k)) '.yuv'], W, H, [1:1:nFrames]);
-        PSNR1  = PSNR(evenFrameOriginalY, evenFrameY,H,W,nFrames);
-        fileD = fopen (['PSNR_' videoID '_down_sem_SP.txt'],'a');
-        fdisp(fileD, [downsampleFactor(i) qscale(k) PSNR1]);
-    fclose(fileD);
+    for i = 1 : length(downsampleFactor)
+        for k = 1:length(qscale)
+            PSNR_M_1(i,k ) = mean(PSNR1(i,k,1:end));
+            PSNR_M_2(i,k ) = mean(PSNR2(i,k,1:end));
+            PSNR_M_3(i,k ) = mean(PSNR3(i,k,1:end));
+        end
     end
+    save(['PSNR_' videoID '_SP.dat' ], 'PSNR_M_1');
+    save(['PSNR_' videoID '_original_com_down.dat' ], 'PSNR_M_2');
+    save(['PSNR_' videoID '_original_sem_down.dat' ], 'PSNR_M_3');
+    system('rm -irf videos/');
+    plot_cur(videoID);
 end
-
-    % k=1;
+% k=1;
 % j=1;
 % bSize = 8;
 % a = zeros(64,64);

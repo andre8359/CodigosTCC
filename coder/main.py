@@ -4,22 +4,20 @@ from coder import *
 import sys
 import os
 
-
-
 video = sys.argv[1]
 H = int(sys.argv[2])
 W = int(sys.argv[3])
+nFrames = int(sys.argv[4])
 downsampleFactor = [2.0/8, 4.0/8]
 dir_ = sys.argv[4]
 qscale = range(2,32)
 
-cod = coder(video,H,W,0.5,"../videos/",1)
+cod = coder(video,H,W,downsampleFactor[0],"../videos/",nFrames,1)
 flag = 0
 for i in downsampleFactor:
     cod.downsampleFactor = i
     cod.codingJpegOddFrames()
     for x in qscale:
-
         cod.number = x
         cod.coderJPEG()
         cod.calcBitRate()

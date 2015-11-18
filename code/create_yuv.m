@@ -20,7 +20,7 @@ function create_yuv(Y,U,V,filename,numfrm,typeOpen)
 
 	if nargin<6
 		typeOpen = 'a'; %append!
-	end;
+	end
 	fid=fopen(filename,typeOpen);
 	if (fid < 0)
 		error('Could not open the file!');
@@ -33,5 +33,5 @@ function create_yuv(Y,U,V,filename,numfrm,typeOpen)
 		fwrite(fid,UVd','uchar');
 		UVd = V(:,:,i);;
 		fwrite(fid,UVd','uchar');
-	end;
+	end
 	fclose(fid);
