@@ -46,11 +46,101 @@ class coder():
             quit()
 
     def coderH264(self):
-        print("TRETA")
+         self.atualizaDim()
+         ffmpeg_ = "ffmpeg "
+         rate_ = "-r 2 -s "
+         filter_ = " -filter:v select=\"mod(n-1\,2)\" "
+         h264_ = "-r 1 -vcodec libx264 "
 
-    def calcBitRate(self):
+        #CODING EVEN FRAMES WITH DOWNSAMPLING
+         qscale_ =  " -q " + self.number.__str__() + " "
+         self.video_even = self.video + "_even_" + self.downsampleFactor.__str__() + "_" + self.number.__str__()
+         filter_ = " -filter:v select=\"not(mod(n-1\,2))\" "
+
+         returnEven = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
+                                                                self.video + ".yuv"+ filter_ + h264_ + qscale_ + " -s "+ self.newW.__str__()\
+                                                                + "x" + self.newH.__str__() +" " + self.video_even + ".h264")
+         #DECODING EVEN FRAMES
+         os.system(ffmpeg_ + " -i " +self.video_even + ".h264"+ " -c:v rawvideo -pix_fmt yuv420p "+self.video_even + ".yuv")
+
+         if  returnEven > 0:
+            print("### ERRO!!!! ###")
+            quit()
+
+    def codingH264OriginalEvenFrames(self):
+        ffmpeg_ = "ffmpeg "
+        rate_ = "-r 2 -s "
+        filter_ = " -filter:v select=\"not(mod(n-1\,2))\" "
+         h264_ = "-r 1 -vcodec libx264 "
+        #CODING ORIGINAL EVEN FRAMES
+        outputFIle_=    self.video + "_even_original_" + self.number.__str__()
+        qscale_ =  " -q " + self.number.__str__() + " "
+        os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
+                                                                self.video + ".yuv"+ filter_ + h264_ + qscale_ +  \
+                                                                " " + outputFIle_ + ".h264")
+        os.system(ffmpeg_ + " -i " + outputFIle_ + ".h264" " -c:v rawvideo -pix_fmt yuv420p "+ outputFIle_+ ".yuv")
+
+    def codingH264OddFrames(self):
+        ffmpeg_ = "ffmpeg "
+        rate_ = "-r 2 -s "
+        filter_ = " -filter:v select=\"mod(n-1\,2)\" "
+         h264_ = "-r 1 -vcodec libx264 "
 
         self.video_odd = self.video + "_odd_" + self.downsampleFactor.__str__()
+
+        # CODING ODD FRAMES WITH NO DOWNSAMPLING
+        qscale_ = " -q:v 1 "
+        #print(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + outputFIle_ )
+
+        returnOdd = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
+                                                                self.video + ".yuv"+ filter_ + h264_ + qscale_ + self.video_odd + ".h264")
+        #DECODING ODD FRAMES
+        os.system(ffmpeg_ + " -i " + self.video_odd + ".h264"+ " -c:v rawvideo -pix_fmt yuv420p "+ self.video_odd + ".yuv")
+        if  returnOdd > 0:
+            print("### ERRO!!!! ###")
+            quit()
+    def codingJPEGOriginalEvenFrames(self):
+
+        ffmpeg_ = "ffmpeg "
+        rate_ = "-r 2 -s "
+        filter_ = " -filter:v select=\"not(mod(n-1\,2))\" "
+        jpeg_ = "-r 1 -vcodec mjpeg "
+        #CODING ORIGINAL EVEN FRAMES
+        outputFIle_=    self.video + "_even_original_" + self.number.__str__()
+        qscale_ =  " -q " + self.number.__str__() + " "
+        os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
+                                                                self.video + ".yuv"+ filter_ + jpeg_ + qscale_ +  \
+                                                                " " + outputFIle_ + ".avi")
+        os.system(ffmpeg_ + " -i " + outputFIle_ + ".avi" " -c:v rawvideo -pix_fmt yuv420p "+ outputFIle_+ ".yuv")
+
+    def codingJPEGOddFrames(self):
+
+        ffmpeg_ = "ffmpeg "
+        rate_ = "-r 2 -s "
+        filter_ = " -filter:v select=\"mod(n-1\,2)\" "
+        jpeg_ = "-r 1 -vcodec mjpeg "
+
+        self.video_odd = self.video + "_odd_" + self.downsampleFactor.__str__()
+
+        # CODING ODD FRAMES WITH NO DOWNSAMPLING
+        qscale_ = " -q:v 1 "
+        #print(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + outputFIle_ )
+
+        returnOdd = os.system(ffmpeg_ + rate_ + self.W.__str__() + "x" + self.H.__str__() + " -i " + self.dir_+ \
+                                                                self.video + ".yuv"+ filter_ + jpeg_ + qscale_ + self.video_odd + ".avi")
+        #DECODING ODD FRAMES
+        os.system(ffmpeg_ + " -i " + self.video_odd + ".avi"+ " -c:v rawvideo -pix_fmt yuv420p "+ self.video_odd + ".yuv")
+        if  returnOdd > 0:
+            print("### ERRO!!!! ###")
+            quit()
+
+    def calcBitRate(self, standard):
+        if standard == "jpeg":
+            ext = ".avi"
+        else if standard == "h264"
+            ext = ".h264"
+
+        self.video_odd = self.video + "_odd_" + self.downsampleFactor.__str__() + "_" +standard
         self.video_even = self.video + "_even_" + self.downsampleFactor.__str__() + "_" + self.number.__str__()
         fileR = open("bitrates_" + self.video + ".txt","a+")
 
@@ -58,8 +148,8 @@ class coder():
             print("### NAO FOI POSSIVEL ABRIR bitrates.txt !!! ###")
             quit()
 
-        odd = os.stat(self.video_odd + ".avi")
-        even = os.stat(self.video_even + ".avi")
+        odd = os.stat(self.video_odd + ext)
+        even = os.stat(self.video_even + ext)
 
         length_odd = float(odd.st_size)
         length_even = float(even.st_size)
@@ -67,29 +157,36 @@ class coder():
         bitrate_odd = length_odd*8.0 /(self.H*self.W*self.nFrames*1.5)
         bitrate_even = length_even*8.0/(self.H*self.W*self.nFrames*1.5)
         fileR.write(self.downsampleFactor.__str__() + \
-                "  " + bitrate_odd.__str__() + " " + bitrate_even.__str__() + " " +self.number.__str__()+"\n")
+                "  " + bitrate_odd.__str__() + " " + bitrate_even.__str__() + "_" +self.number.__str__()+"\n")
         fileR.close()
 
-    def calcBitRateOriginal(self):
 
-        video =   self.video + "_even_original_" + self.number.__str__()
+    def calcBitRateOriginal(self,standard):
+        if standard == "jpeg":
+            ext = ".avi"
+        else if standard == "h264"
+            ext = ".h264"
+        video =   self.video + "_even_original_" + self.number.__str__() + standard
         fileR = open("bitrates_" + self.video + "_original.txt","a+")
 
         if  fileR == 0 :
             print("### NAO FOI POSSIVEL ABRIR bitrates.txt !!! ###")
             quit()
 
-        original = os.stat( video + ".avi")
+        original = os.stat( video + ext)
 
         length_original = float(original.st_size)
 
-        bitrate = length_original*8.0/(self.H*self.W*self.nFrames*1.5)
+        bitrate = length_original*8.0/(self.H*self.W*self.nFrames*1.5   )
 
         fileR.write(self.number.__str__()+ " " + bitrate.__str__() +"\n")
         fileR.close()
 
     def deleteAviFiles(self):
         os.system("rm -irf *.avi ")
+
+    def deleteH264Files(self):
+        os.system("rm -irf *.h264 ")
 
     def getOriginalEvenFrames(self):
 

@@ -24,7 +24,7 @@ for x=1:1:length(w)
     fflush(stdout);
     bSize = 8;
     wSize = 24;
-    nFrames  =2;% nFrames/2.0 ;
+    nFrames  = nFrames/2.0 ;
     %evenFrameOriginalY = read_yuv([evenOrigialFramesID '.yuv'], W, H, [1:1:nFrames]);
 
 
