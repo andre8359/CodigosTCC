@@ -9,26 +9,26 @@ H = int(sys.argv[2])
 W = int(sys.argv[3])
 nFrames = int(sys.argv[4])
 downsampleFactor = [2.0/8, 4.0/8]
-dir_ = sys.argv[4]
+dir_ = sys.argv[5]
 qscale = range(2,32)
 
-cod = coder(video,H,W,downsampleFactor[0],"../videos/",nFrames,1)
+cod = coder(video,H,W,downsampleFactor[0],dir_,nFrames,1)
 flag = 0
 for i in downsampleFactor:
     cod.downsampleFactor = i
-    cod.codingH264OddFrames()
+    cod.codingJPEGOddFrames()
     for x in qscale:
         cod.number = x
-        cod.coderH264()
-        cod.calcBitRate()
+        cod.coderJPEG()
+        cod.calcBitRate("jpeg")
         if flag == 0:
-            cod.codingH264OriginalEvenFrames()
-            cod.calcBitRateOriginal()
+            cod.codingJPEGOriginalEvenFrames()
+            cod.calcBitRateOriginal("jpeg")
     flag = 1
         #   cod.deleteAviFiles()
 
 cod.getOriginalEvenFrames()
-cod.deleteAviFiles()
+cod.deleteH264Files()
 os.system("mkdir videos")
 os.system("mv " + video +"* videos")
 #fileD = open("../videos/catalogo.txt","r")

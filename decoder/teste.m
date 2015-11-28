@@ -11,21 +11,20 @@ for x=1:1:length(w)
     oddFramesID = ['videos/' videoID '_odd'];
     H = h(x);
     W = w(x);
-    nFrames  =nFrames/2.0 ;
+    numFrame  = nFrames(x)/2.0 ;
 
 
-    system(['python  ../coder/main.py "' videoID '" ' num2str(H) ' ' num2str(W) ' ' num2str(150) ' "../videos"   > /dev/null']);
+    system(['python  ../coder/coder_h264.py "' videoID '" ' num2str(H) ' ' num2str(W) ' ' num2str(numFrame) ' "../videos"   > /dev/null']);
 
     downsampleFactor =  [4.0/8  2.0/8];
-    qscale = [2:1:31];
+    qscale = [16:1:51];
 
 
     printf('### SETING PARAMETERS ###\n');
     fflush(stdout);
     bSize = 8;
-    wSize = 24;
-    nFrames  = nFrames/2.0 ;
-    %evenFrameOriginalY = read_yuv([evenOrigialFramesID '.yuv'], W, H, [1:1:nFrames]);
+    wSize = 64;
+
 
 
     for i = 1 : 1 : length(downsampleFactor)
@@ -33,9 +32,9 @@ for x=1:1:length(w)
 
             printf(['### downsampleFactor ' num2str(downsampleFactor(i)) ' qscale ' num2str(qscale(k)) ' ###\n']);fflush(stdout);
 
-           for frame = 0 : 1 : nFrames-1
+           for frame = 0 : 1 : numFrame-1
 
-                evenFrameOriginalY = read_yuv([evenOrigialFramesID '.yuv'], W, H, frame)';
+                evenFrameOriginalY = double(read_yuv([evenOrigialFramesID '.yuv'], W, H, frame)');
 
                 evenID = [evenFramesID '_' num2str(downsampleFactor(i)) '_' num2str(qscale(k))];
                 oddID =  [oddFramesID '_' num2str(downsampleFactor(i))];
@@ -48,12 +47,8 @@ for x=1:1:length(w)
 
                 PSNR1(i,k,frame+1)  = PSNR(evenFrameOriginalY, evenFrameYSP,H,W);
 
-                %evenFrameY = read_yuv([evenID  '.yuv'], W, H,frame)';
-
-
                 PSNR2(i,k,frame+1)   = PSNR(evenFrameOriginalY, evenFrameY,H,W);
-
-                evenFrameYOrigial = read_yuv([evenOrigialFramesID '_' num2str(qscale(k)) '.yuv'], W, H,frame)';
+                evenFrameYOrigial = double(read_yuv([evenOrigialFramesID '_' num2str(qscale(k)) '.yuv'], W, H,frame)');
                 PSNR3(i,k,frame+1)   = PSNR(evenFrameOriginalY, evenFrameYOrigial,H,W);
 
             end
@@ -71,8 +66,11 @@ for x=1:1:length(w)
     save(['PSNR_' videoID '_original_com_down.dat' ], 'PSNR_M_2');
     save(['PSNR_' videoID '_original_sem_down.dat' ], 'PSNR_M_3');
     system('rm -irf videos/');
-    plot_cur(videoID);
+    system('mv bitrates_* PSNR_* dados_h264/.')
+   % plot_cur(videoID);
+    system('( speaker-test -t sine -f 1000 )& pid=$! ; sleep 0.1s ; kill -9 $pid');
 end
+
 % k=1;
 % j=1;
 % bSize = 8;
